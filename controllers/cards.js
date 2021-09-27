@@ -1,6 +1,4 @@
 const Card = require('../models/card');
-const BadRequestError = require('../errors/bad-request-error');
-const NotFoundError = require('../errors/not-found-error');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -13,7 +11,13 @@ module.exports.createCard = (req, res) => {
   const userId = req.user._id;
   Card.create({ name, link, userId })
     .then((card) => res.send(card))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
+    });
 };
 
 module.exports.deleteCardById = (req, res) => {
@@ -21,11 +25,19 @@ module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card === null) {
-        throw new BadRequestError('Карточка с указанным _id не найдена.');
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
-      return res.send(card);
+      res.send(card);
     })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Невалидный id' });
+      } else if (err.statusCode === 404) {
+        res.status(err.statusCode).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -36,16 +48,19 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new BadRequestError('Карточка с указанным _id не найдена.');
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
-      return res.send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
+        res.status(400).send({ message: 'Невалидный id' });
+      } else if (err.statusCode === 404) {
+        res.status(err.statusCode).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
       }
-    })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -56,14 +71,17 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new BadRequestError('Карточка с указанным _id не найдена.');
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
-      return res.send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
+        res.status(400).send({ message: 'Невалидный id' });
+      } else if (err.statusCode === 404) {
+        res.status(err.statusCode).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
       }
-    })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    });
 };

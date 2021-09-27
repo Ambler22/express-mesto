@@ -1,7 +1,7 @@
 {
   "name": "mesto-express",
   "version": "1.0.0",
-  "description": "",
+  "description": "backend of project MESTO",
   "main": "app.js",
   "author": "Drozdov Roman",
   "scripts": {
