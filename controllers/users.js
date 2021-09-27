@@ -1,5 +1,4 @@
 const User = require('../models/user');
-const BadRequestError = require('../errors/bad-request-error');
 
 module.exports.getUser = (req, res) => {
   User.find({})
@@ -12,14 +11,13 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(user);
       }
-      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else if (err.statusCode === 404) {
-        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -29,17 +27,10 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => {
-      if (!name || !about || !avatar) {
-        throw new BadRequestError('Переданы некорректные данные');
-      }
-      res.send(user);
-    })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else if (err.statusCode === 404) {
-        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -53,8 +44,9 @@ module.exports.updateUser = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(user);
       }
-      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -74,8 +66,9 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(user);
       }
-      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

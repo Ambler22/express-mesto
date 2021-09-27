@@ -8,8 +8,8 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  const userId = req.user._id;
-  Card.create({ name, link, userId })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -26,14 +26,13 @@ module.exports.deleteCardById = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(card);
       }
-      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else if (err.statusCode === 404) {
-        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -49,14 +48,13 @@ module.exports.likeCard = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(card);
       }
-      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else if (err.statusCode === 404) {
-        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -72,14 +70,13 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.send(card);
       }
-      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else if (err.statusCode === 404) {
-        res.status(err.statusCode).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
