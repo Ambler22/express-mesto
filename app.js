@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
@@ -9,6 +10,14 @@ const {
   login,
   createUser,
 } = require('./controllers/users');
+
+const validation = (value) => {
+  const result = validator.isURL(value);
+  if (result) {
+    return value;
+  }
+  throw new Error('Введена некорректная ссылка.');
+};
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -31,7 +40,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(4),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().custom(validation),
   }),
 }), createUser);
 
