@@ -32,12 +32,6 @@ router.patch('users/me', celebrate({
 
 router.patch('users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
-  }),
-}), updateAvatar);
-
-router.patch('/users/me/avatar', celebrate({
-  body: Joi.object().keys({
     avatar: Joi.string().required().custom(validation),
   }),
 }), updateAvatar);
