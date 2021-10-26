@@ -1,15 +1,15 @@
 const Card = require('../models/card');
 
 const BadRequestError = require('../errors/bad-request-error');
-const ForbiddenError = require('../errors/forbidden-error');
+const ServerError = require('../errors/server-error');
 const NotFoundError = require('../errors/not-found-error');
-const UnauthorizedError = require('../errors/unauthorized-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
     .catch(() => {
-      next(new ForbiddenError('Произошла ошибка'));
+      next(new ServerError('Произошла ошибка'));
     });
 };
 
@@ -22,7 +22,7 @@ module.exports.createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Невалидный id.'));
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        next(new ServerError('Произошла ошибка'));
       }
     });
 };
@@ -35,7 +35,7 @@ module.exports.deleteCardById = (req, res, next) => {
       if (!data) {
         next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } if (owner !== String(data.owner)) {
-        next(new UnauthorizedError('Вы не можете удалить эту карточку.'));
+        next(new ForbiddenError('Вы не можете удалить эту карточку.'));
       } else {
         res.send(data);
       }
@@ -44,7 +44,7 @@ module.exports.deleteCardById = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Невалидный id.');
       } else {
-        throw new ForbiddenError('Произошла ошибка');
+        throw new ServerError('Произошла ошибка');
       }
     });
 };
@@ -66,7 +66,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Невалидный id.');
       } else {
-        throw new ForbiddenError('Произошла ошибка');
+        throw new ServerError('Произошла ошибка');
       }
     });
 };
@@ -88,7 +88,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Невалидный id.');
       } else {
-        throw new ForbiddenError('Произошла ошибка');
+        throw new ServerError('Произошла ошибка');
       }
     });
 };

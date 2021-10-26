@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
-const ForbiddenError = require('../errors/forbidden-error');
+const ServerError = require('../errors/server-error');
 const NotFoundError = require('../errors/not-found-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
 
@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => {
-      next(new ForbiddenError('Произошла ошибка'));
+      next(new ServerError('Произошла ошибка'));
     });
 };
 
@@ -41,7 +41,7 @@ module.exports.createUser = (req, res, next) => {
 
       bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
-          throw new ForbiddenError('Произошла ошибка');
+          throw new ServerError('Произошла ошибка');
         }
 
         User.create({
@@ -59,7 +59,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        next(new ServerError('Произошла ошибка'));
       }
     });
 };
@@ -81,7 +81,7 @@ module.exports.updateUser = (req, res, next) => {
       } else if (err.name === 'CastError') {
         next(new BadRequestError('Невалидный id.'));
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        next(new ServerError('Произошла ошибка'));
       }
     });
 };
@@ -103,7 +103,7 @@ module.exports.updateAvatar = (req, res, next) => {
       } else if (err.name === 'CastError') {
         next(new BadRequestError('Невалидный id.'));
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        next(new ServerError('Произошла ошибка'));
       }
     });
 };
