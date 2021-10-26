@@ -31,20 +31,20 @@ module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   const owner = req.user._id;
   Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
-      } if (owner !== String(card.owner)) {
-        throw new UnauthorizedError('Вы не можете удалить эту карточку.');
+    .then((data) => {
+      if (!data) {
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
+      } if (owner !== String(data.owner)) {
+        next(new UnauthorizedError('Вы не можете удалить эту карточку.'));
       } else {
-        res.send(card);
+        res.send(data);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Невалидный id.'));
+        throw new BadRequestError('Невалидный id.');
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        throw new ForbiddenError('Произошла ошибка');
       }
     });
 };
@@ -57,16 +57,16 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Невалидный id.'));
+        throw new BadRequestError('Невалидный id.');
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        throw new ForbiddenError('Произошла ошибка');
       }
     });
 };
@@ -79,16 +79,16 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
         res.send(card);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Невалидный id.'));
+        throw new BadRequestError('Невалидный id.');
       } else {
-        next(new ForbiddenError('Произошла ошибка'));
+        throw new ForbiddenError('Произошла ошибка');
       }
     });
 };

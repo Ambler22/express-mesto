@@ -4,6 +4,7 @@ const { errors, celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-error');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const {
@@ -45,8 +46,13 @@ app.post('/signup', celebrate({
 }), createUser);
 
 app.use(auth);
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+
+app.use('/', userRouter);
+app.use('/', cardRouter);
+
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Not Found'));
+});
 
 app.use(errors());
 

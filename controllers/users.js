@@ -17,21 +17,15 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById({ _id: req.params.userId })
+  const { userId } = req.params;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному _id не найден.');
-      } else {
-        res.send(user);
       }
+      res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Невалидный id.'));
-      } else {
-        next(new ForbiddenError('Произошла ошибка'));
-      }
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -76,7 +70,7 @@ module.exports.updateUser = (req, res, next) => {
     { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
         res.send(user);
       }
@@ -98,7 +92,7 @@ module.exports.updateAvatar = (req, res, next) => {
     { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
         res.send(user);
       }
@@ -146,10 +140,18 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-  const userId = req.user._id;
-  User.findById(userId)
-    .then((user) => res.send(user))
-    .catch(() => {
-      next(new ForbiddenError('Произошла ошибка'));
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь не найден'));
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        const error = new BadRequestError('Переданы некорректные данные');
+        return next(error);
+      }
+      return next(err);
     });
 };
